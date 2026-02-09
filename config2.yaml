@@ -1,0 +1,121 @@
+board: MKS TinyBee V1.0 XXYYZ
+name: CNC_TinyBee
+
+kinematics:
+  Cartesian:
+
+i2so:
+  bck_pin: gpio.25
+  data_pin: gpio.27
+  ws_pin: gpio.26
+
+spi:
+  miso_pin: gpio.19
+  mosi_pin: gpio.23
+  sck_pin: gpio.18
+
+sdcard:
+  cs_pin: gpio.5
+  card_detect_pin: gpio.34:low  # Jumper J2 em SDDET
+
+stepping:
+  engine: I2S_STATIC
+  idle_ms: 255
+  pulse_us: 4
+  dir_delay_us: 1
+  disable_delay_us: 2
+
+axes:
+  x:
+    steps_per_mm: 40.000  # Ajuste para TB600 (pitch * microsteps)
+    max_rate_mm_per_min: 8000.000
+    acceleration_mm_per_sec2: 80.000
+    max_travel_mm: 2500.000
+    soft_limits: false
+    homing:
+      cycle: 2
+      positive_direction: false  # Home para negativo (X-)
+      mpos_mm: 0.000
+      feed_mm_per_min: 300.000
+      seek_mm_per_min: 1500.000
+      settle_ms: 500
+      seek_scaler: 1.100
+      feed_scaler: 1.100
+    motor0:
+      limit_neg_pin: gpio.33:low:pu  # Switch X- no conector Limit X-
+      hard_limits: true
+      pulloff_mm: 4.000
+      stepstick:
+        step_pin: I2SO.1
+        direction_pin: I2SO.2
+        disable_pin: I2SO.0
+
+  y:
+    steps_per_mm: 40.000
+    max_rate_mm_per_min: 8000.000
+    acceleration_mm_per_sec2: 70.000
+    max_travel_mm: 1500.000
+    soft_limits: false
+    homing:
+      cycle: 3
+      positive_direction: false  # Home para negativo (Y-)
+      mpos_mm: 0.000
+      feed_mm_per_min: 300.000
+      seek_mm_per_min: 2000.000
+      settle_ms: 500
+      seek_scaler: 1.100
+      feed_scaler: 1.100
+    motor0:
+      limit_neg_pin: gpio.32:low:pu  # Switch Y- no conector Limit Y-
+      hard_limits: true
+      pulloff_mm: 4.000
+      stepstick:
+        step_pin: I2SO.4
+        direction_pin: I2SO.5
+        disable_pin: I2SO.3
+
+  z:
+    steps_per_mm: 200.000  # Exemplo fuso Z
+    max_rate_mm_per_min: 8000.000
+    acceleration_mm_per_sec2: 60.000
+    max_travel_mm: 300.000
+    soft_limits: false
+    homing:
+      cycle: 1
+      positive_direction: true  # Home para positivo (Z+)
+      mpos_mm: 0.000
+      feed_mm_per_min: 300.000
+      seek_mm_per_min: 500.000
+      settle_ms: 500
+      seek_scaler: 1.100
+      feed_scaler: 1.100
+    motor0:
+      limit_pos_pin: gpio.22:low:pu  # Switch Z+ no conector Limit Z-
+      hard_limits: true
+      pulloff_mm: 3.000
+      stepstick:
+        step_pin: I2SO.7
+        direction_pin: I2SO.8
+        disable_pin: I2SO.6
+
+control:
+  safety_door_pin: NO_PIN
+  reset_pin: gpio.35:low  # MT_DET
+  feed_hold_pin: gpio.36:low  # TH1
+  cycle_start_pin: gpio.39:low  # TB
+
+spindle:
+  PWM:
+    pwm_hz: 2500
+    output_pin: gpio.15:high
+    s0_with_disable: true
+    tool_num: 0
+    spinup_ms: 4000
+    spindown_ms: 4000
+    speed_map: 0=0.000% 12000=100.000%
+
+start:
+  must_home: true  # Exige homing antes de jobs
+  gcode:
+    - G90
+    - G92 X0 Y0 Z0
