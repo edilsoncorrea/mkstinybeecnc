@@ -12,6 +12,7 @@ Documentação completa para construção e configuração de CNC utilizando a c
 - [Calibração](#calibração)
 - [Solução de Problemas](#solução-de-problemas)
 - [Recursos Úteis](#recursos-úteis)
+- [Documentação Detalhada](#documentação-detalhada)
 
 ---
 
@@ -239,6 +240,58 @@ M5           ; Desliga spindle
 ### Vídeos
 
 - [MKS TinyBee Setup](https://www.youtube.com/watch?v=mEYtFK7AFOs)
+
+---
+
+## 📖 Documentação Detalhada
+
+Este repositório inclui documentação completa e detalhada em português:
+
+### 🚀 [Início Rápido](docs/inicio-rapido.md)
+Coloque sua CNC funcionando em ~1h30min com este guia passo-a-passo simplificado.
+
+### 🔧 [Hardware](docs/hardware.md)
+- Especificações técnicas completas da MKS TinyBee
+- Layout da placa e conectores
+- Diagrama de pinagem detalhado
+- Configuração dos drivers TMC2209
+- Esquemas de conexão
+
+### 💾 [Instalação](docs/instalacao.md)
+- Três métodos de instalação do firmware
+- Configuração inicial via Wi-Fi ou serial
+- Troubleshooting de instalação
+- Comandos de atualização
+
+### ⚙️ [Configuração](docs/configuracao.md)
+- Explicação detalhada do config.yaml
+- Cálculo de steps_per_mm para diferentes sistemas
+- Configuração de homing e limites
+- Setup de spindle (PWM, relay, VFD)
+- Exemplos práticos
+
+### 📌 [Referência de Pinagem](docs/pinagem-referencia.md)
+- Mapa completo de pinos GPIO
+- Templates para config.yaml
+- Diagrama visual da placa
+- Calculadoras rápidas
+- Guia de troubleshooting rápido
+
+### 🔍 [Solução de Problemas](docs/troubleshooting.md)
+- Problemas de conexão (USB, Wi-Fi, WebUI)
+- Problemas com motores
+- Problemas de limites/homing
+- Problemas de spindle
+- Problemas com SD Card
+- Ferramentas de diagnóstico
+
+### 🔗 [Recursos Úteis](docs/recursos-uteis.md)
+- Links para documentação oficial
+- Ferramentas e software recomendados
+- Comunidades e fóruns
+- Vídeos e tutoriais
+- Calculadoras online
+- Fornecedores
 
 ---
 
