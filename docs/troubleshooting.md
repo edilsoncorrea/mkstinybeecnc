@@ -578,7 +578,7 @@ Mostra o conteúdo do arquivo.
 
 **Sintomas:**
 - GCode ignorado
-- Resposta "error:..." 
+- Resposta "error:..."
 
 **Soluções:**
 
