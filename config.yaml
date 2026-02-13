@@ -1,60 +1,82 @@
+# Configuração FluidNC para MKS TinyBee V1.0
+# Este é um template base - ajuste os valores marcados com <ajuste> ou <seu valor>
+# Documentação completa em: docs/configuracao.md
+
 board: MKS TinyBee V1.0 XXYYZ
-name: SuaMaquinaCNC
+name: SuaMaquinaCNC  # Dê um nome à sua máquina
 
 kinematics:
-  Cartesian:
+  Cartesian:  # Tipo de máquina (Cartesian, CoreXY, etc.)
 
+# Configuração I2S - Controla os motores via interface I2S
+# NÃO ALTERE - Específico da MKS TinyBee
 i2so:
   bck_pin: gpio.25
   data_pin: gpio.27
   ws_pin: gpio.26
 
+# Configuração SPI - Interface para SD Card
+# NÃO ALTERE - Específico da MKS TinyBee
 spi:
   miso_pin: gpio.19
   mosi_pin: gpio.23
   sck_pin: gpio.18
 
+# SD Card - Armazenamento de arquivos G-code
 sdcard:
   cs_pin: gpio.5
-  card_detect_pin: gpio.34:low  # Jumper J2 em SDDET
+  card_detect_pin: gpio.34:low  # Requer jumper J2 na posição SDDET
 
+# Parâmetros de controle dos motores
 stepping:
-  engine: I2S_STATIC
-  idle_ms: 255
-  pulse_us: 4
-  dir_delay_us: 1
-  disable_delay_us: 2
+  engine: I2S_STATIC       # Tipo de controle (I2S_STATIC para TinyBee)
+  idle_ms: 255             # Tempo antes de desabilitar motores (255 = nunca)
+  pulse_us: 4              # Duração do pulso de step (microssegundos)
+  dir_delay_us: 1          # Delay após mudança de direção
+  disable_delay_us: 2      # Delay antes de desabilitar motor
+
+# ============================================================================
+# CONFIGURAÇÃO DOS EIXOS - AJUSTE PARA SUA MÁQUINA
+# ============================================================================
 
 axes:
   x:
-    steps_per_mm: <ajuste, ex: 40>  # Para TB600, calcule pitch*fuso*microsteps
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 80.000
-    max_travel_mm: <seu valor>
-    soft_limits: false
+    # CALCULAR: steps_per_mm = (passos_motor × microsteps) / (pitch × redução)
+    # Exemplo: Motor 200 passos, 16 microsteps, polia GT2 20 dentes (40mm)
+    # steps_per_mm = (200 × 16) / 40 = 80
+    steps_per_mm: <ajuste, ex: 40>  # OBRIGATÓRIO: Ajuste para seu sistema
+    
+    max_rate_mm_per_min: 8000.000     # Velocidade máxima (mm/min)
+    acceleration_mm_per_sec2: 80.000  # Aceleração (mm/s²)
+    max_travel_mm: <seu valor>        # OBRIGATÓRIO: Curso máximo do eixo
+    soft_limits: false                # true = previne ultrapassar max_travel
+    # Configuração de Homing (zeragem automática)
     homing:
-      cycle: 2
-      positive_direction: false
-      mpos_mm: 0.000
-      feed_mm_per_min: 300.000
-      seek_mm_per_min: 1500.000
-      settle_ms: 500
-      seek_scaler: 1.100
-      feed_scaler: 1.100
+      cycle: 2                      # Ordem: 1=primeiro, 2=segundo, 3=terceiro
+      positive_direction: false     # false = busca limite negativo (X-)
+      mpos_mm: 0.000               # Posição após homing
+      feed_mm_per_min: 300.000     # Velocidade de aproximação final (lenta)
+      seek_mm_per_min: 1500.000    # Velocidade de busca inicial (rápida)
+      settle_ms: 500               # Tempo de estabilização (ms)
+      seek_scaler: 1.100           # Multiplicador de distância de busca
+      feed_scaler: 1.100           # Multiplicador de distância de aproximação
     motor0:
-      limit_neg_pin: gpio.33:low:pu  # Limit X-
-      hard_limits: true
-      pulloff_mm: 4.000
+      limit_neg_pin: gpio.33:low:pu  # Endstop X- (:low = acionado em GND, :pu = pull-up)
+      hard_limits: true              # true = para imediatamente ao acionar limite
+      pulloff_mm: 4.000             # Distância de recuo após homing
+      
+      # Pinagem do driver X - NÃO ALTERE (específico da TinyBee)
       stepstick:
-        step_pin: I2SO.1
-        direction_pin: I2SO.2
-        disable_pin: I2SO.0
+        step_pin: I2SO.1            # Pino de step
+        direction_pin: I2SO.2       # Pino de direção (adicione ! para inverter)
+        disable_pin: I2SO.0         # Pino de enable
 
+  # ====== EIXO Y ======
   y:
-    steps_per_mm: <ajuste>
+    steps_per_mm: <ajuste>          # OBRIGATÓRIO: Calcule para seu sistema
     max_rate_mm_per_min: 8000.000
     acceleration_mm_per_sec2: 70.000
-    max_travel_mm: <seu valor>
+    max_travel_mm: <seu valor>      # OBRIGATÓRIO: Curso máximo
     soft_limits: false
     homing:
       cycle: 3
@@ -74,11 +96,12 @@ axes:
         direction_pin: I2SO.5
         disable_pin: I2SO.3
 
+  # ====== EIXO Z ======
   z:
-    steps_per_mm: <ajuste, ex: 200>
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 60.000
-    max_travel_mm: <seu valor>
+    steps_per_mm: <ajuste, ex: 200>  # OBRIGATÓRIO: Geralmente maior que X/Y
+    max_rate_mm_per_min: 8000.000    # Z geralmente mais lento que X/Y
+    acceleration_mm_per_sec2: 60.000 # Z geralmente menor aceleração
+    max_travel_mm: <seu valor>       # OBRIGATÓRIO: Curso máximo
     soft_limits: false
     homing:
       cycle: 1
@@ -98,22 +121,27 @@ axes:
         direction_pin: I2SO.8
         disable_pin: I2SO.6
 
+# Entradas de controle manual
 control:
-  safety_door_pin: NO_PIN
-  reset_pin: gpio.35:low  # MT_DET
-  feed_hold_pin: gpio.36:low  # TH1
-  cycle_start_pin: gpio.39:low  # TB
+  safety_door_pin: NO_PIN          # Sensor de porta/tampa (não usado)
+  reset_pin: gpio.35:low          # Botão de reset/emergência (MT_DET)
+  feed_hold_pin: gpio.36:low      # Botão de pausa (TH1)
+  cycle_start_pin: gpio.39:low    # Botão de início/retomar (TB)
 
-# Exemplo spindle PWM (ajuste para seu setup)
+# ============================================================================
+# CONFIGURAÇÃO DO SPINDLE - Ajuste para seu spindle/motor
+# ============================================================================
 spindle:
   PWM:
-    pwm_hz: 2500
-    output_pin: gpio.15:high
-    s0_with_disable: true
-    tool_num: 0
-    spinup_ms: 4000
-    spindown_ms: 4000
-    speed_map: 0=0.000% 12000=100.000%
+    pwm_hz: 2500                   # Frequência PWM (1000-5000 para ESC)
+    output_pin: gpio.15:high       # Pino de saída PWM
+    s0_with_disable: true          # true = S0 desliga completamente
+    tool_num: 0                    # Número da ferramenta
+    spinup_ms: 4000                # Tempo de aceleração (ms)
+    spindown_ms: 4000              # Tempo de desaceleração (ms)
+    speed_map: 0=0.000% 12000=100.000%  # Mapeamento RPM para duty cycle
+    # Ajuste conforme seu spindle: 0=0% [RPM_máximo]=100%
 
+# Configuração de inicialização
 start:
-  must_home: false
+  must_home: false  # true = exige homing antes de usar (recomendado após testes)
