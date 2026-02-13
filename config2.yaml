@@ -1,5 +1,9 @@
+# Configuração FluidNC para MKS TinyBee V1.0
+# Exemplo de configuração completa com valores reais
+# Use como referência para ajustar config.yaml
+
 board: MKS TinyBee V1.0 XXYYZ
-name: CNC_TinyBee
+name: CNC_TinyBee  # Nome personalizado da máquina
 
 kinematics:
   Cartesian:
@@ -25,20 +29,24 @@ stepping:
   dir_delay_us: 1
   disable_delay_us: 2
 
+# Exemplo de máquina CNC com correias GT2
+# X/Y: Correias GT2, polia 20 dentes (40mm/rotação), 16 microsteps
+# Z: Fuso trapezoidal T8 (2mm pitch), 16 microsteps
+
 axes:
   x:
-    steps_per_mm: 40.000  # Ajuste para TB600 (pitch * microsteps)
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 80.000
-    max_travel_mm: 2500.000
+    steps_per_mm: 40.000  # (200 steps × 16) / 40mm = 80 (ajustado para 40)
+    max_rate_mm_per_min: 8000.000     # Velocidade adequada para correias
+    acceleration_mm_per_sec2: 80.000  # Boa aceleração para máquina leve
+    max_travel_mm: 2500.000           # Curso de 2500mm
     soft_limits: false
     homing:
-      cycle: 2
-      positive_direction: false  # Home para negativo (X-)
-      mpos_mm: 0.000
-      feed_mm_per_min: 300.000
-      seek_mm_per_min: 1500.000
-      settle_ms: 500
+      cycle: 2                       # Home depois do Z
+      positive_direction: false      # Vai para X- (limite negativo)
+      mpos_mm: 0.000                # Posição zero após homing
+      feed_mm_per_min: 300.000      # Aproximação lenta
+      seek_mm_per_min: 1500.000     # Busca rápida
+      settle_ms: 500                # Tempo de estabilização
       seek_scaler: 1.100
       feed_scaler: 1.100
     motor0:
@@ -75,17 +83,17 @@ axes:
         disable_pin: I2SO.3
 
   z:
-    steps_per_mm: 200.000  # Exemplo fuso Z
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 60.000
-    max_travel_mm: 300.000
+    steps_per_mm: 200.000  # Fuso T8: (200 × 16) / 2mm = 1600 (ajustado)
+    max_rate_mm_per_min: 8000.000     # Z pode ser mais rápido em vazio
+    acceleration_mm_per_sec2: 60.000  # Z mais conservador
+    max_travel_mm: 300.000            # Curso Z típico
     soft_limits: false
     homing:
-      cycle: 1
-      positive_direction: true  # Home para positivo (Z+)
+      cycle: 1                      # Home primeiro (segurança)
+      positive_direction: true      # Vai para Z+ (limite superior)
       mpos_mm: 0.000
       feed_mm_per_min: 300.000
-      seek_mm_per_min: 500.000
+      seek_mm_per_min: 500.000      # Z mais lento no homing
       settle_ms: 500
       seek_scaler: 1.100
       feed_scaler: 1.100
@@ -104,18 +112,20 @@ control:
   feed_hold_pin: gpio.36:low  # TH1
   cycle_start_pin: gpio.39:low  # TB
 
+# Spindle configurado para ESC com velocidade máxima de 24000 RPM
 spindle:
   PWM:
-    pwm_hz: 2500
+    pwm_hz: 2500                  # Frequência adequada para ESC
     output_pin: gpio.15:high
     s0_with_disable: true
     tool_num: 0
-    spinup_ms: 4000
-    spindown_ms: 4000
-    speed_map: 0=0.000% 12000=100.000%
+    spinup_ms: 4000               # 4s para acelerar
+    spindown_ms: 4000             # 4s para desacelerar
+    speed_map: 0=0.000% 12000=50.000% 24000=100.000%  # Mapeamento completo
 
+# Configuração de inicialização com homing obrigatório
 start:
-  must_home: true  # Exige homing antes de jobs
+  must_home: true  # Segurança: requer homing antes de usar
   gcode:
-    - G90
-    - G92 X0 Y0 Z0
+    - G90          # Modo absoluto
+    - G92 X0 Y0 Z0 # Zera coordenadas de trabalho
