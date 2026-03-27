@@ -52,15 +52,6 @@ axes:
         direction_pin: I2SO.2
         disable_pin: I2SO.0
 
-    # use E0 driver for 2nd X axis motor
-    motor1:
-      hard_limits: true
-      pulloff_mm: 4.000
-      stepstick:
-        step_pin: I2SO.10
-        direction_pin: I2SO.11
-        disable_pin: I2SO.9
-
   y:
     steps_per_mm: 40
     max_rate_mm_per_min: 8000.000
@@ -79,22 +70,21 @@ axes:
 
     motor0:
       limit_neg_pin: gpio.32:low:pu
-      hard_limits: false
+      hard_limits: true
       pulloff_mm: 4.000
       stepstick:
         step_pin: I2SO.4
         direction_pin: I2SO.5
         disable_pin: I2SO.3
 
-    # use E1 driver for 2nd Y axis motor
-    motor1:
-      limit_neg_pin: NO_PIN
-      hard_limits: false
-      pulloff_mm: 4.000
-      stepstick:
-        step_pin: I2SO.13
-        direction_pin: I2SO.14
-        disable_pin: I2SO.12
+#    # use E0 driver for 2nd X axis motor
+#    motor1:
+#      hard_limits: false
+#      pulloff_mm: 4.000
+#      stepstick:
+#        step_pin: I2SO.10
+#        direction_pin: I2SO.11
+#        disable_pin: I2SO.9
 
   z:
     steps_per_mm: 200.000
@@ -122,7 +112,7 @@ axes:
         disable_pin: I2SO.6
         
 probe:
-  pin: gpio.35:pu:low
+  pin: gpio.35:low
   check_mode_start: true        
 
 control:
@@ -158,13 +148,13 @@ PWM:
   spindown_ms: 4000
   speed_map: 0=0.000% 12000=100.000%
 
-Laser:
-  pwm_hz: 5000
-  # on 3D Touch connector (has pdwn + PWM)
-  output_pin: gpio.2:high:pd
-  s0_with_disable: true
-  tool_num: 1
-  speed_map: 0=0.000% 1000=100.000%
+#Laser:
+#  pwm_hz: 5000
+#  # on 3D Touch connector (has pdwn + PWM)
+#  output_pin: gpio.2:high:pd
+#  s0_with_disable: true
+#  tool_num: 1
+#  speed_map: 0=0.000% 1000=100.000%
 
 start:
   must_home: false
