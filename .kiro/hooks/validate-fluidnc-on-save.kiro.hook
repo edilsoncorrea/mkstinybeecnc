@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Validar FluidNC config ao salvar",
+  "description": "Quando qualquer config.yaml for salvo, executa a validação de pinos, conflitos e valores do FluidNC para a MKS TinyBee",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "config.yaml",
+      "config*.yaml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "O arquivo config.yaml do FluidNC foi salvo. Execute a validação completa usando o skill validate-fluidnc-config: verifique conflitos de GPIO, pinos input-only usados como saída, I2SOs incorretos por eixo, valores fora de range (steps_per_mm, velocidade, aceleração), e blocos fixos alterados. Apresente um relatório resumido com críticos, avisos e infos. Se tudo estiver correto, confirme que o config passou na validação."
+  }
+}

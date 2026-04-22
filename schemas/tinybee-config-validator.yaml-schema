@@ -1,0 +1,363 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FluidNC config.yaml — MKS TinyBee V1.0",
+  "description": "Schema de validação para o arquivo config.yaml do FluidNC na placa MKS TinyBee V1.0",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "board": {
+      "type": "string",
+      "description": "Identificação da placa. Não alterar.",
+      "const": "MKS TinyBee V1.0 XXYYZ"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nome personalizado da máquina CNC"
+    },
+    "kinematics": {
+      "type": "object",
+      "description": "Tipo de cinemática da máquina",
+      "properties": {
+        "Cartesian":   { "type": ["object", "null"] },
+        "CoreXY":      { "type": ["object", "null"] },
+        "SCARA":       { "type": ["object", "null"] },
+        "WallPlotter": { "type": ["object", "null"] }
+      }
+    },
+    "i2so": {
+      "type": "object",
+      "description": "Configuração do barramento I2S — FIXO para MKS TinyBee. Não alterar.",
+      "additionalProperties": false,
+      "properties": {
+        "bck_pin":  { "type": "string", "const": "gpio.25", "description": "Bit Clock — fixo na TinyBee" },
+        "data_pin": { "type": "string", "const": "gpio.27", "description": "Data — fixo na TinyBee" },
+        "ws_pin":   { "type": "string", "const": "gpio.26", "description": "Word Select — fixo na TinyBee" }
+      },
+      "required": ["bck_pin", "data_pin", "ws_pin"]
+    },
+    "spi": {
+      "type": "object",
+      "description": "Configuração SPI para SD Card — FIXO para MKS TinyBee. Não alterar.",
+      "additionalProperties": false,
+      "properties": {
+        "miso_pin": { "type": "string", "const": "gpio.19" },
+        "mosi_pin": { "type": "string", "const": "gpio.23" },
+        "sck_pin":  { "type": "string", "const": "gpio.18" }
+      },
+      "required": ["miso_pin", "mosi_pin", "sck_pin"]
+    },
+    "sdcard": {
+      "type": "object",
+      "description": "Configuração do cartão SD",
+      "additionalProperties": false,
+      "properties": {
+        "cs_pin": {
+          "type": "string",
+          "const": "gpio.5",
+          "description": "Chip Select do SD Card — fixo na TinyBee"
+        },
+        "card_detect_pin": {
+          "type": "string",
+          "description": "Detecção de cartão. Use gpio.34:low com jumper J2 em SDDET, ou NO_PIN",
+          "enum": ["gpio.34:low", "NO_PIN"]
+        }
+      },
+      "required": ["cs_pin"]
+    },
+    "stepping": {
+      "type": "object",
+      "description": "Parâmetros de controle de passo",
+      "additionalProperties": false,
+      "properties": {
+        "engine": {
+          "type": "string",
+          "const": "I2S_STATIC",
+          "description": "Engine de stepping — FIXO para MKS TinyBee"
+        },
+        "idle_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535,
+          "description": "Tempo em ms antes de desabilitar motores. 255 = nunca desabilitar"
+        },
+        "pulse_us": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Duração do pulso de step em microssegundos. Típico: 4"
+        },
+        "dir_delay_us": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Delay após mudar direção em microssegundos. Típico: 1"
+        },
+        "disable_delay_us": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Delay antes de desabilitar em microssegundos. Típico: 2"
+        }
+      },
+      "required": ["engine"]
+    },
+    "axes": {
+      "type": "object",
+      "description": "Configuração dos eixos da máquina",
+      "additionalProperties": false,
+      "properties": {
+        "x": { "$ref": "#/definitions/axis_x" },
+        "y": { "$ref": "#/definitions/axis_y" },
+        "z": { "$ref": "#/definitions/axis_z" },
+        "a": { "$ref": "#/definitions/axis_e0" },
+        "b": { "$ref": "#/definitions/axis_e1" }
+      }
+    },
+    "probe": {
+      "type": "object",
+      "description": "Configuração do sensor de probe (Z-probe)",
+      "additionalProperties": false,
+      "properties": {
+        "pin": {
+          "type": "string",
+          "description": "Pino do probe. Na TinyBee: gpio.35:low (MT_DET). Input-only."
+        },
+        "check_mode_start": {
+          "type": "boolean",
+          "description": "Verifica estado do probe ao iniciar"
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "description": "Entradas de controle da máquina. GPIOs 34, 35, 36, 39 são input-only.",
+      "additionalProperties": false,
+      "properties": {
+        "safety_door_pin": { "type": "string", "description": "Pino da porta de segurança. Use NO_PIN se não instalado." },
+        "reset_pin":       { "type": "string", "description": "Pino de reset/emergência. Na TinyBee: gpio.35:low (MT_DET)." },
+        "feed_hold_pin":   { "type": "string", "description": "Pino de feed hold. Na TinyBee: gpio.36:low (TH1)." },
+        "cycle_start_pin": { "type": "string", "description": "Pino de cycle start. Na TinyBee: gpio.39:low (TB)." },
+        "macro0_pin": { "type": "string" },
+        "macro1_pin": { "type": "string" },
+        "macro2_pin": { "type": "string" },
+        "macro3_pin": { "type": "string" }
+      }
+    },
+    "coolant": {
+      "type": "object",
+      "description": "Configuração de coolant e relés",
+      "additionalProperties": false,
+      "properties": {
+        "flood_pin": {
+          "type": "string",
+          "description": "Pino flood coolant. Na TinyBee: i2so.16 (Heated Bed terminal)",
+          "enum": ["i2so.16", "i2so.17", "NO_PIN"]
+        },
+        "mist_pin": {
+          "type": "string",
+          "description": "Pino mist coolant. Na TinyBee: i2so.17 (HE0 terminal)",
+          "enum": ["i2so.16", "i2so.17", "NO_PIN"]
+        },
+        "delay_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Delay em ms após ativar coolant"
+        }
+      }
+    },
+    "PWM": {
+      "$ref": "#/definitions/spindle_pwm",
+      "description": "Configuração de spindle PWM"
+    },
+    "Laser": {
+      "$ref": "#/definitions/spindle_pwm",
+      "description": "Configuração de laser (spindle modo laser)"
+    },
+    "Relay": {
+      "type": "object",
+      "description": "Configuração de spindle por relé simples",
+      "additionalProperties": false,
+      "properties": {
+        "output_pin":  { "type": "string", "description": "Pino de saída. Não usar input-only (34,35,36,39)." },
+        "tool_num":    { "type": "integer", "minimum": 0 },
+        "spinup_ms":   { "type": "integer", "minimum": 0 },
+        "spindown_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "start": {
+      "type": "object",
+      "description": "Configurações de inicialização",
+      "additionalProperties": false,
+      "properties": {
+        "must_home": {
+          "type": "boolean",
+          "description": "Se true, exige homing antes de aceitar comandos de movimento"
+        },
+        "gcode": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Lista de comandos GCode executados após boot"
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "homing_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cycle": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "description": "Ordem de homing. 1=primeiro (geralmente Z). Mesmo número = simultâneo."
+        },
+        "positive_direction": {
+          "type": "boolean",
+          "description": "true = busca limite na direção positiva (+). false = direção negativa (-)."
+        },
+        "mpos_mm":         { "type": "number", "description": "Posição de máquina após homing. Geralmente 0." },
+        "feed_mm_per_min": { "type": "number", "minimum": 1, "description": "Velocidade lenta de aproximação ao limite" },
+        "seek_mm_per_min": { "type": "number", "minimum": 1, "description": "Velocidade rápida de busca do limite" },
+        "settle_ms":       { "type": "integer", "minimum": 0, "description": "Tempo de estabilização após acionar limite (ms)" },
+        "seek_scaler":     { "type": "number", "minimum": 1.0, "description": "Fator de distância extra na busca. 1.1 = 110%" },
+        "feed_scaler":     { "type": "number", "minimum": 1.0, "description": "Fator de distância extra na aproximação. 1.1 = 110%" }
+      }
+    },
+
+    "motor_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "limit_neg_pin": { "type": "string", "description": "Pino do endstop negativo. Formato: gpio.XX:low:pu" },
+        "limit_pos_pin": { "type": "string", "description": "Pino do endstop positivo. Formato: gpio.XX:low:pu" },
+        "hard_limits":   { "type": "boolean", "description": "true = para imediatamente ao acionar limite" },
+        "pulloff_mm":    { "type": "number", "minimum": 0.1, "maximum": 50, "description": "Distância de recuo após homing (mm)" },
+        "stepstick":     { "$ref": "#/definitions/i2so_motor_pins" }
+      }
+    },
+
+    "i2so_motor_pins": {
+      "type": "object",
+      "description": "Pinos de controle do driver stepstick via I2S. Use ! para inverter lógica.",
+      "additionalProperties": false,
+      "properties": {
+        "step_pin": {
+          "type": "string",
+          "pattern": "^!?I2SO\\.(1[0-4]|[0-9])$",
+          "description": "Pino de step. Adicione ! para inverter."
+        },
+        "direction_pin": {
+          "type": "string",
+          "pattern": "^!?I2SO\\.(1[0-4]|[0-9])$",
+          "description": "Pino de direção. Adicione ! para inverter o sentido do motor."
+        },
+        "disable_pin": {
+          "type": "string",
+          "pattern": "^!?I2SO\\.(1[0-4]|[0-9])$",
+          "description": "Pino de enable/disable do driver."
+        }
+      },
+      "required": ["step_pin", "direction_pin", "disable_pin"]
+    },
+
+    "axis_common": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "steps_per_mm": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 5000,
+          "description": "Passos por milímetro. Fórmula: (passos_motor × microsteps) / (pitch × redução). Típico GT2: 80, fuso 5mm: 640, fuso T8: 1600"
+        },
+        "max_rate_mm_per_min": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 30000,
+          "description": "Velocidade máxima em mm/min. Típico: 3000–12000. Acima de 15000 é incomum."
+        },
+        "acceleration_mm_per_sec2": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 500,
+          "description": "Aceleração em mm/s². Típico: 30–150. Eixo Z geralmente menor que X e Y."
+        },
+        "max_travel_mm": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Curso máximo do eixo em mm. Meça fisicamente."
+        },
+        "soft_limits": {
+          "type": "boolean",
+          "description": "Habilita verificação de limites por software. Requer homing."
+        },
+        "homing": { "$ref": "#/definitions/homing_config" },
+        "motor0": { "$ref": "#/definitions/motor_config" },
+        "motor1": { "$ref": "#/definitions/motor_config" }
+      }
+    },
+
+    "axis_x": {
+      "allOf": [
+        { "$ref": "#/definitions/axis_common" },
+        { "description": "Eixo X — pinos corretos: disable=I2SO.0, step=I2SO.1, dir=I2SO.2. Limite padrão: gpio.33 (X-)" }
+      ]
+    },
+    "axis_y": {
+      "allOf": [
+        { "$ref": "#/definitions/axis_common" },
+        { "description": "Eixo Y — pinos corretos: disable=I2SO.3, step=I2SO.4, dir=I2SO.5. Limite padrão: gpio.32 (Y-). Para tandem (2 motores), motor1 usa slot E0: I2SO.9/10/11" }
+      ]
+    },
+    "axis_z": {
+      "allOf": [
+        { "$ref": "#/definitions/axis_common" },
+        { "description": "Eixo Z — pinos corretos: disable=I2SO.6, step=I2SO.7, dir=I2SO.8. Limite padrão: gpio.22 (Z+). Homing cycle=1 (primeiro)." }
+      ]
+    },
+    "axis_e0": {
+      "allOf": [
+        { "$ref": "#/definitions/axis_common" },
+        { "description": "4º eixo (slot E0) — pinos corretos: disable=I2SO.9, step=I2SO.10, dir=I2SO.11" }
+      ]
+    },
+    "axis_e1": {
+      "allOf": [
+        { "$ref": "#/definitions/axis_common" },
+        { "description": "5º eixo (slot E1) — pinos corretos: disable=I2SO.12, step=I2SO.13, dir=I2SO.14" }
+      ]
+    },
+
+    "spindle_pwm": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pwm_hz": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 100000,
+          "description": "Frequência PWM em Hz. ESC: 1000–5000. Laser: 5000–20000. Típico: 2500"
+        },
+        "output_pin": {
+          "type": "string",
+          "description": "Pino de saída PWM. Na TinyBee: gpio.17 (recomendado, sem pulsos no boot) ou gpio.15 (EXP1, pode dar pulsos no boot). NUNCA usar gpio.34/35/36/39."
+        },
+        "s0_with_disable": {
+          "type": "boolean",
+          "description": "true = S0 desliga completamente o spindle"
+        },
+        "tool_num":    { "type": "integer", "minimum": 0 },
+        "spinup_ms":   { "type": "integer", "minimum": 0, "description": "Tempo de aceleração do spindle (ms)" },
+        "spindown_ms": { "type": "integer", "minimum": 0, "description": "Tempo de desaceleração do spindle (ms)" },
+        "speed_map": {
+          "type": "string",
+          "description": "Mapeamento RPM=duty%. DEVE começar com 0=0.000%. Ex: '0=0.000% 24000=100.000%'",
+          "pattern": "^0=0(\\.0+)?%.*"
+        }
+      },
+      "required": ["output_pin", "speed_map"]
+    }
+  }
+}

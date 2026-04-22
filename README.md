@@ -12,6 +12,7 @@ Documentação completa para construção e configuração de CNC utilizando a c
 - [Calibração](#calibração)
 - [Solução de Problemas](#solução-de-problemas)
 - [Recursos Úteis](#recursos-úteis)
+- [Ecossistema de Validação com Kiro](#-ecossistema-de-validação-com-kiro)
 - [Documentação Detalhada](#documentação-detalhada)
 
 ---
@@ -292,6 +293,77 @@ Coloque sua CNC funcionando em ~1h30min com este guia passo-a-passo simplificado
 - Vídeos e tutoriais
 - Calculadoras online
 - Fornecedores
+
+---
+
+## 🤖 Ecossistema de Validação com Kiro
+
+Este repositório inclui um ecossistema completo para edição assistida e validação do `config.yaml` usando o [Kiro IDE](https://kiro.dev). O objetivo é evitar erros de wiring — como conflitos de GPIO, pinos incorretos por eixo, ou valores fora de range — antes de fazer upload para a placa.
+
+### Como funciona
+
+O Kiro carrega automaticamente o contexto de hardware da MKS TinyBee e as regras de configuração do FluidNC em todas as interações. Isso permite que o assistente raciocine sobre implicações de mudanças de hardware com precisão.
+
+### Arquivos do ecossistema
+
+#### Steering (contexto sempre ativo)
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `.kiro/steering/fluidnc-hardware.md` | Fonte de verdade do hardware: todos os GPIOs, I2SOs, conectores físicos, jumpers e GPIOs livres da TinyBee |
+| `.kiro/steering/fluidnc-config-rules.md` | 15 regras de validação: unicidade de GPIO, pinos input-only, I2SOs corretos por eixo, ranges de valores |
+| `.kiro/steering/fluidnc-capabilities.md` | Capacidades e limitações completas do FluidNC na TinyBee, baseadas no código-fonte oficial |
+
+#### Skills (capacidades sob demanda)
+
+| Skill | Como usar | O que faz |
+|-------|-----------|-----------|
+| `validate-fluidnc-config` | `#validate-fluidnc-config` no chat | Auditoria completa do config.yaml com relatório de críticos 🔴, avisos 🟡 e infos 🔵 |
+| `hardware-change-impact` | `#hardware-change-impact` no chat | Dado "quero adicionar endstops individuais no Y", analisa pinos, riscos, gera diff exato do config e procedimento de teste |
+
+#### Hook automático
+
+Ao salvar qualquer `config*.yaml`, o Kiro executa automaticamente a validação e reporta problemas no chat.
+
+#### Schema YAML
+
+O arquivo `schemas/tinybee-config-validator.yaml-schema` fornece:
+- Autocomplete para todas as seções do config
+- Descrições inline de cada parâmetro
+- Validação de valores (ranges, constantes fixas, padrões de pinos I2SO)
+
+Requer a extensão **YAML (Red Hat)** no VS Code / Kiro. Já configurado em `.vscode/settings.json`.
+
+### Exemplos de uso
+
+**Validar o config atual:**
+```
+#validate-fluidnc-config
+```
+
+**Analisar impacto de uma mudança:**
+```
+#hardware-change-impact
+Quero adicionar endstops individuais para os dois motores do eixo Y (auto-squaring)
+```
+
+**Perguntar sobre capacidades:**
+```
+Posso usar VFD Modbus e spindle PWM ao mesmo tempo nessa placa?
+```
+
+### O que o ecossistema conhece
+
+Com base na análise do [código-fonte do FluidNC](https://github.com/bdring/FluidNC):
+
+- Mapeamento completo de todos os GPIOs físicos e I2SOs da TinyBee
+- Quais GPIOs são input-only (34, 35, 36, 39) e quais são reservados pelo sistema
+- Capacidade de até 6 eixos e 2 motores por eixo (tandem/auto-squaring)
+- Todos os tipos de spindle suportados (PWM, Laser, Relay, VFD Modbus, Huanyang, etc.)
+- User Outputs/Inputs para controle de relés e válvulas via GCode (M62-M68)
+- Macros configuráveis (`after_homing`, `after_reset`, `startup_line`)
+- Parking automático do eixo Z
+- Limitações específicas da TinyBee (DAC 0-10V indisponível, VFD Modbus consome gpio.16/17, etc.)
 
 ---
 

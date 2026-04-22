@@ -1,0 +1,21 @@
+{
+    // FluidNC — Validação do config.yaml com schema da MKS TinyBee
+    // Requer extensão "YAML" (Red Hat) instalada no VS Code / Kiro
+    "yaml.schemas": {
+        "./schemas/tinybee-config-validator.yaml-schema": [
+            "config.yaml",
+            "config*.yaml",
+            "config_para_mks/config.yaml",
+            "config_backup_que_funciona/config.yaml"
+        ]
+    },
+    "yaml.validate": true,
+    "yaml.hover": true,
+    "yaml.completion": true,
+    "chat.tools.terminal.autoApprove": {
+        "/^\\$env:MCP_DOCS_ROOT='C:/ferramentas/McpDocumentacao/docs'; \\$env:MCP_INDEX_PATH='C:/ferramentas/McpDocumentacao/index'; \\$env:MCP_ALLOWED_EXTENSIONS='\\.txt,\\.md,\\.markdown,\\.pdf'; \\$env:MCP_MAX_FILE_SIZE_MB='20'; \\$env:MCP_EXCLUDED_DIRECTORIES='\\.git,\\.mcpdocserver,bin,obj,\\.vs'; & \"C:\\\\ferramentas\\\\McpDocumentacao\\\\McpDocServer\\.exe\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
