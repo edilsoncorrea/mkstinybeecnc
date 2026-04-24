@@ -111,15 +111,15 @@ Estes pinos são **reservados para o SD Card** e não devem ser reutilizados.
 
 Os seguintes GPIOs não têm função atribuída por padrão e podem ser usados para expansões (endstops adicionais, relés, etc.):
 
-| GPIO    | Tipo          | Observação                                      |
-|---------|---------------|-------------------------------------------------|
-| gpio.2  | I/O           | Usado no conector 3D Touch (pdwn + PWM)         |
-| gpio.4  | I/O           | Disponível                                      |
-| gpio.13 | I/O           | Disponível                                      |
-| gpio.14 | I/O           | Disponível                                      |
-| gpio.16 | I/O           | Disponível                                      |
-| gpio.17 | I/O           | EXP1 IO17 — alternativa ao gpio.15 para spindle |
-| gpio.21 | I/O           | Disponível                                      |
+| GPIO    | Tipo | Status atual                                         |
+|---------|------|------------------------------------------------------|
+| gpio.2  | I/O  | **EM USO** — Z- endstop (conector 3D Touch)          |
+| gpio.4  | I/O  | **EM USO** — X+ endstop (fiação adaptada)            |
+| gpio.13 | I/O  | **EM USO** — Y- motor1 endstop (fiação adaptada)     |
+| gpio.14 | I/O  | **EM USO** — Y+ endstop compartilhado (fiação adapt.)|
+| gpio.16 | I/O  | Disponível                                           |
+| gpio.17 | I/O  | Disponível — alternativa ao gpio.15 para spindle     |
+| gpio.21 | I/O  | Disponível                                           |
 
 > ⚠️ GPIOs 6–11 são usados pela flash interna do ESP32 e **nunca devem ser usados**.
 

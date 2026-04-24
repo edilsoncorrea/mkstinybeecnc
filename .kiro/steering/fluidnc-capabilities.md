@@ -281,20 +281,15 @@ meta: "texto livre"             # metadados da configuração
 
 ## Resumo: Slots Disponíveis na TinyBee para Configurações Complexas
 
-| Recurso | Disponível | Observação |
-|---------|-----------|------------|
-| Motores | 5 | X, Y, Z, E0, E1 |
-| Eixos independentes | até 5 | se 1 motor por eixo |
-| Motores tandem | até 2 | usa E0 e/ou E1 |
-| Endstops dedicados | 3 | X- (33), Y- (32), Z+ (22) |
-| Endstops extras | 7 | GPIOs livres: 2,4,13,14,16,17,21 |
-| Spindle PWM | 1 | gpio.15 ou gpio.17 |
-| Spindle Laser | 1 | gpio.2 (3D Touch) |
+| Recurso | Disponível | Status atual |
+|---------|-----------|-------------|
+| Motores | 5 | X, Y(motor0), Y(motor1/E0), Z — E1 livre |
+| Endstops dedicados | 3 | X- (33), Y- (32), Z+ (22) — todos em uso |
+| Endstops extras usados | 4 | X+(4), Y1-(13), Y+(14), Z-(2) |
+| GPIOs livres restantes | 3 | gpio.16, gpio.17, gpio.21 |
+| Spindle PWM | 1 | gpio.15 (ativo) |
+| Spindle Laser | ⚠️ | gpio.2 ocupado por Z- — requer realocação |
 | Coolant/Relés | 2 | i2so.16, i2so.17 |
-| User Outputs digitais | até 7 | GPIOs livres |
-| User Outputs analógicos | até 7 | GPIOs livres |
 | Probe | 1 | gpio.35 |
-| Toolsetter | 1 | GPIO livre |
-| Controles (botões) | 3 fixos + 4 macro | 35, 36, 39 + GPIOs livres |
-| VFD Modbus | 1 | requer UART (gpio.16/17) |
+| VFD Modbus | possível | gpio.16/17 disponíveis |
 | DAC 0-10V | ❌ | gpio.25/26 reservados para I2S |
