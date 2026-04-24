@@ -27,9 +27,9 @@ Fonte oficial: [makerbase-mks/MKS-TinyBee README](https://github.com/makerbase-m
 | gpio.12 | EXP2 BTN_EN2           | I/O        | Livre                                   |
 | gpio.13 | EXP1 BTN_ENC           | I/O        | **Y- motor1 endstop** (auto-squaring)   |
 | gpio.14 | EXP2 BTN_EN1           | I/O        | **Y+ endstop** (compartilhado Y0/Y1)    |
-| gpio.15 | EXP1 LCD_D6            | I/O        | **Spindle PWM** ⚠️ pulsos no boot       |
+| gpio.15 | EXP1 LCD_D6            | I/O        | Livre (era spindle, migrado para gpio.17)|
 | gpio.16 | EXP1 LCD_D5 / UART2 RX | I/O        | Livre (reserva para UART/VFD)           |
-| gpio.17 | EXP1 LCD_D7 / UART2 TX | I/O        | Livre (alt. spindle sem pulsos no boot) |
+| gpio.17 | EXP1 LCD_D7 / UART2 TX | I/O        | **Spindle PWM** (sem pulsos no boot)    |
 | gpio.18 | TF Card SCK / EXP2     | I/O        | SPI SCK — fixo                          |
 | gpio.19 | TF Card MISO / EXP2    | I/O        | SPI MISO — fixo                         |
 | gpio.20 | —                      | —          | Não exposto na placa                    |
@@ -106,10 +106,10 @@ Fonte oficial: [makerbase-mks/MKS-TinyBee README](https://github.com/makerbase-m
 | TB       | gpio.39 | Cycle Start     |
 
 ### Spindle
-| Conector | GPIO    | Observação                              |
-|----------|---------|-----------------------------------------|
-| EXP1 LCD_D6 | gpio.15 | PWM ativo ⚠️ pulsos curtos no boot  |
-| EXP1 LCD_D7 | gpio.17 | Alternativa recomendada (sem pulsos)  |
+| Conector    | GPIO    | Observação                              |
+|-------------|---------|------------------------------------------|
+| EXP1 LCD_D7 | gpio.17 | **PWM ativo** — sem pulsos no boot ✅   |
+| EXP1 LCD_D6 | gpio.15 | Livre (não usar — pulsos no boot)       |
 
 ### Coolant / Relés
 | Conector     | I2SO    | Uso no projeto  |
@@ -134,8 +134,8 @@ Fonte oficial: [makerbase-mks/MKS-TinyBee README](https://github.com/makerbase-m
 |---------|-----------------|-----------------------------------------|
 | gpio.0  | EXP1 LCD_D4     | Livre — sem conflito                    |
 | gpio.12 | EXP2 BTN_EN2    | Livre — sem conflito                    |
+| gpio.15 | EXP1 LCD_D6     | Livre — NÃO usar (pulsos no boot)       |
 | gpio.16 | EXP1 LCD_D5     | Livre — reserva para UART2 RX (VFD)    |
-| gpio.17 | EXP1 LCD_D7     | Livre — alternativa spindle / UART2 TX |
 | gpio.21 | EXP1 LCD_EN     | Livre — sem conflito                    |
 
 ---
@@ -145,6 +145,7 @@ Fonte oficial: [makerbase-mks/MKS-TinyBee README](https://github.com/makerbase-m
 | Situação | Detalhe |
 |----------|---------|
 | ⚠️ gpio.2 em uso para Z- | Se ativar Laser, o `output_pin` do Laser precisa ser realocado para gpio.0, gpio.12 ou gpio.21 |
-| ⚠️ gpio.15 para spindle | Pode dar pulsos curtos no boot — risco de ativar spindle. Considere migrar para gpio.17 |
+| ✅ gpio.17 para spindle | Migrado de gpio.15 — sem pulsos no boot |
+| ⚠️ gpio.15 livre mas perigoso | Não usar para saídas — dá pulsos no boot |
 | ⚠️ gpio.35 compartilhado | Probe e Reset usam o mesmo pino MT_DET — apenas um pode estar ativo por vez |
 | ℹ️ Display LCD | EXP1/EXP2 não serão usados — GPIOs desses conectores estão disponíveis |

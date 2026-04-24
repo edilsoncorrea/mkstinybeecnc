@@ -287,7 +287,7 @@ meta: "texto livre"             # metadados da configuração
 | Endstops dedicados | 3 | X- (33), Y- (32), Z+ (22) — todos em uso |
 | Endstops extras usados | 4 | X+(4), Y1-(13), Y+(14), Z-(2) |
 | GPIOs livres restantes | 3 | gpio.16, gpio.17, gpio.21 |
-| Spindle PWM | 1 | gpio.15 (ativo) |
+| Spindle PWM | 1 | gpio.17 (ativo, sem pulsos no boot) |
 | Spindle Laser | ⚠️ | gpio.2 ocupado por Z- — requer realocação |
 | Coolant/Relés | 2 | i2so.16, i2so.17 |
 | Probe | 1 | gpio.35 |

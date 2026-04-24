@@ -1,5 +1,5 @@
 board: MKS TinyBee V1.0 XXYYZ
-name:
+name: CNC-MKS-TinyBee
 
 kinematics:
   Cartesian:
@@ -27,8 +27,9 @@ stepping:
   disable_delay_us: 2
 
 axes:
-  # homing_runs: 2 recomendado para melhor precisão com auto-squaring no Y
-  homing_runs: 2
+  shared_stepper_disable_pin: NO_PIN
+  # homing_runs: 2 — 2 ciclos de approach/pulloff para melhor precisão no auto-squaring do Y
+  # NOTA: homing_runs é suportado pelo FluidNC mas pode não ser reconhecido por schemas YAML externos
 
   x:
     steps_per_mm: 40
@@ -157,10 +158,9 @@ coolant:
 # spindle PWM signal
 PWM:
   pwm_hz: 2500
-  # on EXP1 IO15 connector.
-  # note IO15 will give some short pulses on boot, which may activate spindle
-  # use IO17 on EXP1 to avoid
-  output_pin: gpio.15:high
+  # on EXP1 IO17 connector — sem pulsos no boot (preferível ao IO15)
+  # IO15 dá pulsos curtos no boot que podem ativar o spindle acidentalmente
+  output_pin: gpio.17:high
   s0_with_disable: true
   tool_num: 0
   spinup_ms: 4000
