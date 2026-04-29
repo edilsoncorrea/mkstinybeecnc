@@ -93,8 +93,8 @@ axes:
     motor1:
       # Y- lado B — GPIO livre (gpio.13), requer fiação adaptada
       limit_neg_pin: gpio.13:low:pu
-      # Y+ compartilhado — mesmo pino do motor0
-      limit_pos_pin: gpio.14:low:pu
+      # Y+ NÃO definido aqui — FluidNC não permite mesmo GPIO em dois motores
+      # O limit_pos do motor0 (gpio.14) já protege o eixo inteiro
       hard_limits: true
       pulloff_mm: 4.000
       stepstick:

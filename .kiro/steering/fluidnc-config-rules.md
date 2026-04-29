@@ -11,9 +11,11 @@ Este documento define as regras de negócio que governam o `config.yaml` para a 
 ## Regras de Pinos — Conflitos Proibidos
 
 ### R1 — Unicidade de GPIO
-Cada GPIO físico só pode ter **uma função**. Se o mesmo `gpio.XX` aparecer em dois lugares do config, isso é um conflito crítico.
+Cada GPIO físico só pode ter **uma função** em todo o config. Se o mesmo `gpio.XX` aparecer em dois lugares do config, isso é um conflito crítico — **o FluidNC rejeita o config e não carrega o motor1**.
 
-**Exceção conhecida e documentada:** `gpio.35` é compartilhado entre `probe.pin` e `control.reset_pin` no config atual. Apenas um deve estar ativo (o outro deve ser `NO_PIN`).
+**Isso inclui:** mesmo GPIO em motor0 e motor1 do mesmo eixo (ex: limit_pos_pin compartilhado). O FluidNC trata cada motor como uma entidade separada e exige GPIOs únicos.
+
+**Exceção conhecida e documentada:** `gpio.35` é compartilhado entre `probe.pin` e `control.reset_pin` no config atual. Apenas um deve estar ativo (o outro deve ser `NO_PIN` ou comentado).
 
 ### R2 — GPIOs Input-Only
 Os GPIOs 34, 35, 36 e 39 são **input-only** no ESP32. Nunca devem ser usados como saída (spindle, coolant, relés, etc.).
