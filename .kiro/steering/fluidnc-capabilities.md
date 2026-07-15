@@ -19,7 +19,7 @@ Fonte: análise do código-fonte em https://github.com/bdring/FluidNC
 - Inversão de direção por software com `!` no `direction_pin`
 - `limit_neg_pin`, `limit_pos_pin` e `limit_all_pin` por motor
 - `shared_stepper_disable_pin` — um único pino para desabilitar todos os motores
-- `homing_runs` — número de ciclos approach/pulloff (padrão: 1, recomendado: 2 para precisão)
+- `homing_runs` — número de ciclos approach/pulloff (padrão: 2 quando omitido no config)
 
 ### Limitações na TinyBee
 - **5 drivers físicos** (X, Y, Z, E0, E1) — máximo de 5 motores simultâneos

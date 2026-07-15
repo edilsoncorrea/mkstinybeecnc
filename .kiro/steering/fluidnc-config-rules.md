@@ -72,8 +72,28 @@ axes:
         disable_pin: I2SO.9
 ```
 
-### R7 — Endstops Independentes para Tandem
-Quando um eixo usa dois motores com endstops independentes (auto-squaring), cada motor deve ter seu próprio `limit_neg_pin` ou `limit_pos_pin` apontando para GPIOs diferentes.
+### R7 — Endstops para Tandem (Dual Motor)
+Quando um eixo usa dois motores, existem dois modos de operação:
+
+**Modo 1 — Auto-squaring (2 endstops):**
+Cada motor tem seu próprio `limit_neg_pin` ou `limit_pos_pin` apontando para GPIOs diferentes. Permite correção individual de posição.
+
+**Modo 2 — POG style (1 endstop):**
+Apenas motor0 tem endstop. O FluidNC detecta `motorsWithSwitches() == 1` e usa `makeDualSwitches()` para compartilhar o endstop com motor1 via máscara de bits. Ambos os motores param juntos.
+
+**Warning cosmético:** No modo POG, o FluidNC emite `[MSG:WARN:: Motor1 switches do not support negative homing dir]`. Este warning é **cosmético** — a lógica do eixo aceita homing se pelo menos um motor suporta a direção (usa `break` ao encontrar o primeiro). O homing funciona normalmente.
+
+**Fonte:** `FluidNC/src/Machine/Axis.cpp` linhas 54-76, `Motor.cpp` linhas 77-83.
+
+**IMPORTANTE:** Não confundir o warning com falha de homing. Se Y não move após `$H`, verificar:
+1. Status com `?` — se está em Alarm, usar `$X` para unlock
+2. Se `must_home: true` e o homing falhou por outro motivo (ex: endstop não aciona), a máquina trava
+3. Testar com `$X` + `G1 Y10 F500` para isolar se é problema de homing vs motor/driver
+
+**Soluções para eliminar o warning:**
+1. Adicionar endstop ao motor1 (ex: `limit_neg_pin: gpio.13:low:pu`) — ativa auto-squaring
+2. Ignorar o warning — POG funciona com endstop único
+3. Remover motor1 se o segundo motor não está conectado fisicamente
 
 ---
 
@@ -105,6 +125,51 @@ Quando um eixo usa dois motores com endstops independentes (auto-squaring), cada
 - Deve ser maior que zero
 - Deve ser menor que `max_travel_mm`
 - Valores típicos: 2–10 mm
+
+### R12b — soft_limits e range de movimento válido
+Quando `soft_limits: true`, o FluidNC calcula o range permitido a partir de `mpos_mm` e `max_travel_mm`:
+
+- **Regra:** O range válido é `[mpos_mm, mpos_mm + max_travel_mm]` quando `positive_direction: false` (homing no lado negativo, curso na direção positiva)
+- **Regra:** O range válido é `[mpos_mm - max_travel_mm, mpos_mm]` quando `positive_direction: true` (homing no lado positivo, curso na direção negativa)
+- Comando GCode que resulte em posição **exatamente igual** ao limite pode ser rejeitado — use margem de 1-2mm
+
+**IMPORTANTE — G54 e soft_limits:**
+O soft_limits avalia a posição **de máquina** (MPos), não a posição de trabalho (WPos). Se há um offset G54 ativo (ex: G54 Y=-320), um `G1 Y10` calcula MPos target = WPos + offset = 10 + (-320) = -310, que pode cair fora do range. Sintomas: `[MSG:INFO: Soft limit on Y target:-310.000]` quando o comando parece válido.
+
+**Para macros de parking/posicionamento pós-homing, sempre usar `G53`** (coordenadas de máquina, one-shot), que ignora o G54:
+```
+$H
+G53 G0 Y330
+G53 G0 Z-50
+```
+
+**Requisitos do G53 no FluidNC (confirmado no código-fonte GCode.cpp):**
+- G53 requer `G0` ou `G1` explícito **na mesma linha** — sem isso retorna erro `G53 invalid motion mode`
+- G53 NÃO aplica offsets (G54/G92/TLO) ao target — usa coordenada de máquina direta
+- Se o soft_limit reporta um target inesperado (ex: +4 quando mandou -40), o G53 não foi processado — o offset G54 está sendo aplicado
+- **Possíveis causas de G53 não funcionar:**
+  1. CNCjs quebrando a linha em duas (G53 separado do G0)
+  2. Estado de Alarm impedindo parsing de GCode
+  3. Modo modal ativo diferente de G0/G1 (ex: G38.x após probe)
+- **Workaround:** Enviar `G0` sozinho na linha anterior para garantir modo modal, ou usar `G0 G53 Z-40`
+
+Alternativa: zerar G54 com `G10 L2 P1 X0 Y0 Z0` antes dos movimentos.
+
+**Fórmulas de range (confirmadas em FluidNC/src/Limit.cpp):**
+```
+limitsMaxPosition = positiveDirection ? mpos : mpos + maxTravel
+limitsMinPosition = positiveDirection ? mpos - maxTravel : mpos
+```
+
+**Exemplo prático (Y no projeto atual):**
+- `positive_direction: false` + `mpos_mm: 0` + `max_travel_mm: 334`
+- Range válido: Y de 0 a ~333mm (334 pode ser rejeitado por ser o limite exato)
+- `G53 G0 Y330` funciona sempre — não depende de G54
+
+**Exemplo Z:**
+- `positive_direction: true` + `mpos_mm: 0` + `max_travel_mm: 80`
+- Range válido: Z de -80 a 0mm
+- `G53 G0 Z-50` funciona sempre
 
 ---
 

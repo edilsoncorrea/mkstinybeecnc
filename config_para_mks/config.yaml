@@ -16,7 +16,6 @@ spi:
 
 sdcard:
   cs_pin: gpio.5
-  # uses TH2 IO34 active low - MAKE SURE jumper J2 is set to SDDET!!!
   card_detect_pin: gpio.34:low
 
 stepping:
@@ -27,16 +26,12 @@ stepping:
   disable_delay_us: 2
 
 axes:
-  shared_stepper_disable_pin: NO_PIN
-  # homing_runs: 2 — 2 ciclos de approach/pulloff para melhor precisão no auto-squaring do Y
-  # NOTA: homing_runs é suportado pelo FluidNC mas pode não ser reconhecido por schemas YAML externos
-
   x:
-    steps_per_mm: 40
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 80.000
-    max_travel_mm: 2500.000
-    soft_limits: false
+    steps_per_mm: 400
+    max_rate_mm_per_min: 4200.000
+    acceleration_mm_per_sec2: 300.000
+    max_travel_mm: 360.000
+    soft_limits: true
     homing:
       cycle: 2
       positive_direction: false
@@ -48,25 +43,22 @@ axes:
       feed_scaler: 1.100
 
     motor0:
-      # X- endstop — conector X-LIMIT da placa (gpio.33)
       limit_neg_pin: gpio.33:low:pu
-      # X+ endstop — GPIO livre (gpio.4), requer fiação adaptada
-      limit_pos_pin: gpio.4:low:pu
-      hard_limits: true
+      hard_limits: false
       pulloff_mm: 4.000
       stepstick:
         step_pin: I2SO.1
-        direction_pin: I2SO.2
+        direction_pin: I2SO.2:low
         disable_pin: I2SO.0
 
   y:
-    steps_per_mm: 40
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 70.000
-    max_travel_mm: 1250.000
-    soft_limits: false
+    steps_per_mm: 1600
+    max_rate_mm_per_min: 1080.000
+    acceleration_mm_per_sec2: 300.000
+    max_travel_mm: 345.000
+    soft_limits: true
     homing:
-      cycle: 3
+      cycle: 2
       positive_direction: false
       mpos_mm: 0.000
       feed_mm_per_min: 300.000
@@ -77,11 +69,8 @@ axes:
 
     # motor0 = lado A do pórtico — driver Y da placa
     motor0:
-      # Y- lado A — conector Y-LIMIT da placa (gpio.32)
       limit_neg_pin: gpio.32:low:pu
-      # Y+ compartilhado entre motor0 e motor1 — GPIO livre (gpio.14)
-      limit_pos_pin: gpio.14:low:pu
-      hard_limits: true
+      hard_limits: false
       pulloff_mm: 4.000
       stepstick:
         step_pin: I2SO.4
@@ -89,26 +78,20 @@ axes:
         disable_pin: I2SO.3
 
     # motor1 = lado B do pórtico — driver E0 da placa
-    # Endstops independentes habilitam auto-squaring no homing
     motor1:
-      # Y- lado B — GPIO livre (gpio.13), requer fiação adaptada
-      limit_neg_pin: gpio.13:low:pu
-      # Y+ NÃO definido aqui — FluidNC não permite mesmo GPIO em dois motores
-      # O limit_pos do motor0 (gpio.14) já protege o eixo inteiro
-      hard_limits: true
+      hard_limits: false
       pulloff_mm: 4.000
       stepstick:
-        # Slot E0: I2SO.9 (enable), I2SO.10 (step), I2SO.11 (dir)
         step_pin: I2SO.10
         direction_pin: I2SO.11
         disable_pin: I2SO.9
 
   z:
-    steps_per_mm: 200.000
-    max_rate_mm_per_min: 8000.000
-    acceleration_mm_per_sec2: 60.000
+    steps_per_mm: 800.000
+    max_rate_mm_per_min: 3000.000
+    acceleration_mm_per_sec2: 200.000
     max_travel_mm: 80.000
-    soft_limits: false
+    soft_limits: true
     homing:
       cycle: 1
       positive_direction: true
@@ -120,11 +103,8 @@ axes:
       feed_scaler: 1.100
 
     motor0:
-      # Z+ endstop (homing sobe) — conector Z-LIMIT da placa (gpio.22)
       limit_pos_pin: gpio.22:low:pu
-      # Z- endstop — GPIO livre (gpio.2), conector 3D Touch da placa
-      limit_neg_pin: gpio.2:low:pu
-      hard_limits: true
+      hard_limits: false
       pulloff_mm: 3.000
       stepstick:
         step_pin: I2SO.7
@@ -137,11 +117,7 @@ probe:
 
 control:
   safety_door_pin: NO_PIN
-  # on MT_DET connector — compartilhado com probe, use apenas um por vez
-  #reset_pin: gpio.35:low
-  # on TH1 connector
   feed_hold_pin: gpio.36:low
-  # on TB connector
   cycle_start_pin: gpio.39:low
   macro0_pin: NO_PIN
   macro1_pin: NO_PIN
@@ -149,32 +125,22 @@ control:
   macro3_pin: NO_PIN
 
 coolant:
-  # Heated Bed Terminal Block
   flood_pin: i2so.16
-  # HE0 Terminal Block
-  mist_pin: i2so.17
+  mist_pin: gpio.21:low
   delay_ms: 0
 
-# spindle PWM signal
 PWM:
   pwm_hz: 2500
-  # on EXP1 IO17 connector — sem pulsos no boot (preferível ao IO15)
-  # IO15 dá pulsos curtos no boot que podem ativar o spindle acidentalmente
   output_pin: gpio.17:high
+  enable_pin: i2so.17
   s0_with_disable: true
   tool_num: 0
   spinup_ms: 4000
   spindown_ms: 4000
-  speed_map: 0=0.000% 12000=100.000%
-
-#Laser:
-#  pwm_hz: 5000
-#  # on 3D Touch connector (has pdwn + PWM) — gpio.2 em uso para Z-
-#  # se ativar laser, liberar gpio.2 do Z- e usar outro GPIO
-#  output_pin: gpio.2:high:pd
-#  s0_with_disable: true
-#  tool_num: 1
-#  speed_map: 0=0.000% 1000=100.000%
+  speed_map: 0=0.000% 18000=100.000%
 
 start:
-  must_home: false
+  must_home: true
+
+arc_tolerance_mm: 0.002
+junction_deviation_mm: 0.05

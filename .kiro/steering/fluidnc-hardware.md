@@ -30,6 +30,8 @@ Os motores são controlados exclusivamente via barramento I2S. Os pinos I2SO sã
 
 **Regra:** Nunca reutilize um I2SO para dois eixos. Nunca use I2SO para endstops ou controles.
 
+**Inversão de direção em pinos I2SO:** Use `I2SO.X:low` (NÃO use `!I2SO.X` — sintaxe inválida para I2S). Exemplo: `direction_pin: I2SO.2:low`
+
 ### Pinos físicos do barramento I2S
 
 | Função   | GPIO    |
