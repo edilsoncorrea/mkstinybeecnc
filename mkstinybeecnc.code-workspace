@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../FluidNC"
+		},
+		{
+			"path": "../FluidNC-Pendant"
+		},
+		{
+			"path": "../cncjs"
+		},
+		{
+			"path": "../MKS-TinyBee"
+		},
+		{
+			"path": "../bcnc"
+		},
+		{
+			"path": "../../especialista-pcb"
+		},
+		{
+			"path": "../FlatCAM-Plus"
+		}
+	],
+	"settings": {}
+}
